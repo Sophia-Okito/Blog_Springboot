@@ -11,9 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/stars")
@@ -48,19 +46,15 @@ public class FavouriteController {
     }
 
     //get all starred post by user
-    @GetMapping("/{postId}/{userId}")
-    public ResponseEntity<List<Post>> getStarPosts(@PathVariable(name = "userId") Long userId, @PathVariable(name = "postId") Long postId) {
+    @GetMapping("/{userId}")
+    public ResponseEntity<List> getStarPosts(@PathVariable(name = "userId") Long userId) {
         Optional<User> user = userService.getUserById(userId);
         if (user.isPresent()) {
-            Optional<Post> post = postService.getPostById(postId);
-            if (post.isPresent()) {
-                Post post1 = post.get();
-                List<Favourite> favourites = favouriteService.findAllByUser(user.get());
-                List<Post> posts = new ArrayList<>();
-                for (Favourite favourite : favourites)
-                    posts.add(favourite.getPost());
-                return new ResponseEntity<>(posts, HttpStatus.OK);
-            }
+            List<Favourite> favourites = favouriteService.findAllByUser(user.get());
+            List<Post> posts = new ArrayList<>();
+            for (Favourite favourite : favourites)
+                posts.add(favourite.getPost());
+            return new ResponseEntity<List>(posts,  HttpStatus.OK);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }

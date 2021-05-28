@@ -13,17 +13,6 @@ public class FollowService {
     @Autowired
     FollowRepository followRepository;
 
-    public List<Follow> getAllByFollowee(User user) {
-        return followRepository.findAllByFollowee(user);
-    }
-
-    public List<Follow> getAllByFollower(User user) {
-        return followRepository.findAllByFollower(user);
-    }
-
-    public Follow getByFolloweeAndFollower(User followee, User follower) {
-        return followRepository.findByFolloweeAndFollower(followee, follower);
-    }
 
     public void deleteFollow(Follow follow) {
         followRepository.delete(follow);
@@ -31,5 +20,17 @@ public class FollowService {
 
     public void addFollow(Follow newFollow) {
         followRepository.save(newFollow);
+    }
+
+    public List<Follow> getAllByUser(User user) {
+        return followRepository.findAllByUser(user);
+    }
+
+    public List<Follow> getAllByFollowing(User user) {
+        return followRepository.findAllByFollowing(user);
+    }
+
+    public Follow getByFollowingAndUser(User user, User user1) {
+        return followRepository.findByFollowingAndUser(user, user1);
     }
 }

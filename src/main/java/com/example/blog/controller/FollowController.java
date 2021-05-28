@@ -22,64 +22,66 @@ public class FollowController {
     @Autowired
     FollowService followService;
 
-    @PostMapping("/{followeeId}/{followerId}")
-    public ResponseEntity<?> follow(@PathVariable(name = "followeeId") Long followeeId, @PathVariable(name = "followerId") Long followerId) {
-        Optional<User> follower = userService.getUserById(followerId);
-        if (follower.isPresent()) {
-            Optional<User> followee = userService.getUserById(followeeId);
+    // create connection
+    @PostMapping("/{followingId}/{userId}")
+    public ResponseEntity<?> follow(@PathVariable(name = "followingId") Long followingId, @PathVariable(name = "userId") Long userId) {
+        Optional<User> user = userService.getUserById(userId);
+        if (user.isPresent()) {
+            Optional<User> followee = userService.getUserById(followingId);
             if (followee.isPresent()) {
-                Follow follow = followService.getByFolloweeAndFollower(followee.get(), follower.get());
+                Follow follow = followService.getByFollowingAndUser(followee.get(), user.get());
                 if (follow == null) {
                     Follow newFollow = new Follow();
-                    newFollow.setFollowee(followee.get());
-                    newFollow.setFollower(follower.get());
+                    newFollow.setFollowing(followee.get());
+                    newFollow.setUser(user.get());
                     followService.addFollow(newFollow);
-                    return new ResponseEntity<>(HttpStatus.OK);
+                    return new ResponseEntity<>("Users Connection Successful", HttpStatus.OK);
                 }
 
             }
         }
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Not A Registered User", HttpStatus.BAD_REQUEST);
+    }
+
+    //Get a user following
+    @GetMapping("/{userId}/followings")
+    public ResponseEntity<?> following(@PathVariable(name = "userId") Long id) {
+        Optional<User> user = userService.getUserById(id);
+        if (user.isPresent()) {
+            List<Follow> follows =  followService.getAllByUser(user.get());
+            List<User> followers = new ArrayList<>();
+            for (Follow follow: follows)
+                followers.add(follow.getFollowing());
+            return new ResponseEntity<>(followers, HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Not a registered user", HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping("/{userId}/followers")
-    public ResponseEntity<?> followers(@PathVariable(name = "userId") Long id) {
-        Optional<User> followee = userService.getUserById(id);
-        if (followee.isPresent()) {
-            List<Follow> follows =  followService.getAllByFollowee(followee.get());
-//            List<User> followers = new ArrayList<>();
-//            for (Follow follow: follows)
-//                followers.add(follow.getFollower());
-            return new ResponseEntity<>(follows, HttpStatus.OK);
+    public ResponseEntity<?> follower(@PathVariable(name = "userId") Long id) {
+        Optional<User> user = userService.getUserById(id);
+        if (user.isPresent()) {
+            List<Follow> follows =  followService.getAllByFollowing(user.get());
+            List<User> followings = new ArrayList<>();
+            for (Follow follow: follows)
+                followings.add(follow.getUser());
+            return new ResponseEntity<>(followings, HttpStatus.OK);
         }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>("Not a Registered User", HttpStatus.BAD_REQUEST);
     }
 
-    @GetMapping("/{userId}/followees")
-    public ResponseEntity<?> followees(@PathVariable(name = "userId") Long id) {
-        Optional<User> follower = userService.getUserById(id);
-        if (follower.isPresent()) {
-            List<Follow> follows =  followService.getAllByFollower(follower.get());
-//            List<User> followees = new ArrayList<>();
-//            for (Follow follow: follows)
-//                followees.add(follow.getFollowee());
-            return new ResponseEntity<>(follows, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    }
-
-    @DeleteMapping("/{followeeId}/{followerId}")
-    public ResponseEntity<?> unfollow(@PathVariable(name = "followeeId") Long followeeId, @PathVariable(name = "followerId") Long followerId) {
+    @DeleteMapping("/{followingId}/{userId}")
+    public ResponseEntity<?> unfollow(@PathVariable(name = "followingId") Long followeeId, @PathVariable(name = "userId") Long followerId) {
         Optional<User> follower = userService.getUserById(followerId);
         if (follower.isPresent()) {
             Optional<User> followee = userService.getUserById(followeeId);
             if (followee.isPresent()) {
-                Follow follow = followService.getByFolloweeAndFollower(followee.get(), follower.get());
+                Follow follow = followService.getByFollowingAndUser(followee.get(), follower.get());
                 if (follow != null)
                 followService.deleteFollow(follow);
-                return new ResponseEntity<>(HttpStatus.OK);
+                return new ResponseEntity<>("Users Disconnection Successfully",HttpStatus.OK);
             }
         }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>("Not a Register User", HttpStatus.BAD_REQUEST);
     }
 }

@@ -38,7 +38,7 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<List<User>> getUsers() {
-        List<User> users = userService.findAll();
+        List<User> users = userService.findAll(0);
         return new ResponseEntity<>(users, HttpStatus.OK);
     }
 
@@ -51,6 +51,18 @@ public class UserController {
         userService.deleteUser(user);
         return new ResponseEntity<>("request pending", HttpStatus.NO_CONTENT);
 
+    }
+
+    @PostMapping("/reactivate/{id}")
+    public ResponseEntity<?> reverseAccountDeletion(@PathVariable Long id){
+        Optional<User> user = userService.getUserById(id);
+        if(user.isEmpty())
+            return new ResponseEntity<>("Not A registered User", HttpStatus.UNAUTHORIZED);
+        String message = userService.reverseDelete(user.get());
+        if(message.equals("Delete action successfully reversed"))
+            return new ResponseEntity<>("successfully reversed", HttpStatus.ACCEPTED);
+        else
+            return new ResponseEntity<>("user not authorized", HttpStatus.UNAUTHORIZED);
     }
 
 }

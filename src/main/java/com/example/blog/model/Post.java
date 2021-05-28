@@ -24,6 +24,10 @@ public class Post implements Serializable {
     @ManyToOne()
     private User user;
 
+    public Post(String text) {
+        this.text = text;
+    }
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<Comment> comments;
 

@@ -13,4 +13,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     User getByUsernameAndPassword(String username, String password);
 
     List<User> findAllByPersonDeactivated(int i);
+
+    List<User> findAllByPersonDeactivatedEquals(int number);
 }

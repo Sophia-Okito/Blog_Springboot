@@ -28,8 +28,8 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public List<User> findAll() {
-        return userRepository.findAll();
+    public List<User> findAll(int number) {
+        return userRepository.findAllByPersonDeactivatedEquals(number);
     }
 
     public User getUserByUsernameAndPassword(String username, String password) {
@@ -43,7 +43,7 @@ public class UserService {
         try {
             Optional<User> user = userRepository.findById(person.get().getId());
             Calendar calendar = Calendar.getInstance();
-            calendar.add(Calendar.MINUTE, 5);
+            calendar.add(Calendar.MINUTE, 1);
             String presentDate = DateFor.format(calendar.getTime());
             user.get().setPersonDeactivated(1);
             user.get().setRemoveDate(presentDate);
@@ -70,5 +70,15 @@ public class UserService {
             }
         });
         System.out.println("The list of scheduled for deletion"+persons);
+    }
+
+    public String reverseDelete(User user){
+        String flag = "";
+        if(user.getPersonDeactivated() == 1){
+            user.setPersonDeactivated(0);
+            userRepository.save(user);
+            flag = "Delete action successfully reversed";
+        }
+        return flag;
     }
 }

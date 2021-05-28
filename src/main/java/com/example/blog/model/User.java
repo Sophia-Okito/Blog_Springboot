@@ -34,6 +34,13 @@ public class User implements Serializable {
 
     private String removeDate;
 
+
+    public User(Long id, String username, String password) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+    }
+
     @JsonIgnore
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Post> posts;

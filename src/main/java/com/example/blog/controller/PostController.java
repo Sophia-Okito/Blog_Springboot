@@ -97,7 +97,7 @@ public class  PostController {
             Optional<Post> post = postService.getPostById(postId);
             if (post.isPresent()) {
                 Post post1 = post.get();
-                if (post1.getUser().getId() == userId){
+                if (post1.getUser().getId().equals(userId)){
                     postService.deletePost(post1);
                     return new ResponseEntity<>(HttpStatus.OK);
                 }
@@ -108,7 +108,7 @@ public class  PostController {
 
     //Like a post
     @PostMapping(path = "/{postId}/like/{userId}")
-    public ResponseEntity<?> likePost(@PathVariable(name = "postId") Long postId, @PathVariable(name = "userId") Long userId) {
+    public ResponseEntity<?> likeOrDislikePost(@PathVariable(name = "postId") Long postId, @PathVariable(name = "userId") Long userId) {
         Optional<User> user = userService.getUserById(userId);
         Optional<Post> post = postService.getPostById(postId);
         if (user.isPresent()) {
